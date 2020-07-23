@@ -10,36 +10,46 @@ var questions = [new Question("Which of the following is not a method for an arr
                  new Question("Which of the following expressions will return false?", ["[1] == [1]", "\"1\" == true", "\"\" == false", "[1] == \"1\""], 0),
                  new Question("What does the parseInt() function return if it's argument cannot be converted to a number?", ["undefined", "null", "NaN", "infinity"], 2),
                  new Question("Which of the following is the method for converting an object to a JSON string?", ["toString()", "parse()", "stringify()", "splice()"], 2),
-                 new Question("True or False: In order to use the Math object we need to first create it.", ["True", "False"], 1),
+                 new Question("True or False: In order to use the Math object we need to create it first.", ["True", "False"], 1),
                  new Question("What is the value of z, Given: var y = 3; var x = 9; z = x++ * ++y;", [30, 40, 27, 36], 0)];
 
 var qIndex = 0;
-var startingTime = 90;
+var startingTime = 60;
 var timeElapsed = 0;
 var score = 0;
-var promptDisplay = document.querySelector(".prompt-card");
+var wasCorrect = false;
+var promptDisplay = document.querySelector("#prompt-display");
 var timeDisplay = document.querySelector("#time-left").textContent = startingTime - timeElapsed;
 var interval;
 
 document.addEventListener("click", function() {
 
     let targetId = event.target.id;
-    console.log(targetId);
     let targetTagName = event.target.nodeName;
 
+    //Changes prompt when a button is pushed, else do nothing
     if(targetTagName == "BUTTON"){
         if(targetId == "start"){
 
             interval = setInterval(startTimer, 1000);
         }
-        else if(targetId == questions[qIndex].correctResponse){
+        else if(qIndex > 0 && targetId == questions[qIndex - 1].correctResponse){
+            wasCorrect = true;
             score++;
         }
         else{
+            wasCorrect = false;
             timeElapsed = timeElapsed + 10;
         }
-
-        ++qIndex == questions.length || startingTime < timeElapsed ? renderReport() : renderNextQuestion();
+        
+        if(qIndex < questions.length){
+            renderNextQuestion();
+            qIndex++;
+        }
+        else{
+            clearInterval(interval);
+            renderReport();
+        }
     }
 });
 
@@ -47,26 +57,40 @@ function renderNextQuestion(){
     //clear prompt
     promptDisplay.innerHTML = "";
 
-    //Added next questions text
+    //Adds question text to prompt
     var node = document.createElement("H3");
-    console.log(questions[qIndex].questionText);
     var textNode = document.createTextNode(questions[qIndex].questionText);
     node.appendChild(textNode);
     promptDisplay.appendChild(node);
 
-    //Add buttons for response with text
+    //Adds buttons for response
     for(i = 0; i < questions[qIndex].response.length; i++){
         let buttonNode = document.createElement("BUTTON");
         buttonNode.textContent = questions[qIndex].response[i];
         buttonNode.className += "btn btn-primary btn-lg";
         buttonNode.id = i;
         promptDisplay.appendChild(buttonNode);
+    }
 
+    node = document.createElement("hr");
+    promptDisplay.appendChild(node);
+
+    if(qIndex != 0){
+        node = document.createElement("H4");
+        wasCorrect != 0 ? node.innerHTML = "Correct" : node.textContent = "Incorrect";
+        promptDisplay.appendChild(node);
     }
 }
 
 function renderReport(){
     promptDisplay.innerHTML = "";
+
+    //Adds question text to prompt
+    var timeRemaining = startingTime - timeElapsed;
+    var node = document.createElement("H3");
+    var textNode = document.createTextNode("You answered " + score + " question(s) correctly with " + timeRemaining + " second(s) remaining.");
+    node.appendChild(textNode);
+    promptDisplay.appendChild(node);
 
 }
 
@@ -74,8 +98,8 @@ function startTimer(){
 
     timeElapsed++;
 
-    if(startingTime < timeElapsed || qIndex == questions.length) {
-        startingTime = timeElapsed;
+    if(startingTime <= timeElapsed) {
+        timeElapsed = startingTime;
         renderReport();
         clearInterval(interval);
     }
@@ -94,5 +118,5 @@ function shuffleQuestions(){
     }
 }
 
-shuffleQuestions();
+//shuffleQuestions();
 

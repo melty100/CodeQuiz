@@ -18,23 +18,24 @@
 
     <div class="container-fluid">
         <header class="row text-center">
-            <div class="col-md">
+            <div class="col-md-3">
                 <h5>View highscore</h5>
             </div>
-            <div class="col-md">
+            <div class="col-md-6">
                 <h1 class="text-center">Javascript Quiz</h1>
             </div>
-            <div class="col-md">
+            <div class="col-md-3">
                 <h5>Timer: <span id="time-left"></span></h5>
             </div>
 
     </div>
     <div class="row justify-content-center">
-        <div class="prompt-card col-md-6">
+        <div id="prompt-display" class="col-md-6 text-center">
             <h3>Answer as many questions within the given amount of time. Keep in mind that answering incorrectly will
-                deduct 10
-                seconds from time. Press start to begin!</h3>
-            <button id="start" type="button" class="btn btn-secondary mx-auto d-block">Start quiz</button>
+                deduct 10 seconds from the clock. Your score is equal to the amount of questions answered correctly plus
+                the amount of time left on the clock divided by 10. Press start to begin!</h3>
+            <button id="start" type="button" class="btn btn-danger">Start quiz</button>
+            <hr>
         </div>
 
     </div>
