@@ -9,6 +9,14 @@ body{
     margin-top:250px;
 }
 
+input {
+    margin-left: 10px;
+}
+
+header {
+    margin-top: 20px;
+}
+
 ul {
     list-style-type: none;
 }
