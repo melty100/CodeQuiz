@@ -23,7 +23,7 @@ var questions = [
     new Question("True or False: In order to use the Math object we need to create it first.", ["True", "False"], 1),
     new Question("What is the value of z, Given: var y = 3; var x = 9; z = x++ * ++y;", [30, 40, 27, 36], 0)];
 
-var startingTime = 1;
+var startingTime = 60;
 var timeElapsed = 0;
 var score = 0;
 var wasCorrect = false;
@@ -32,34 +32,44 @@ var userInitials;
 var submitted = false;
 var promptDisplay = document.querySelector("#prompt-display");
 var timeDisplay = document.querySelector("#time-left");
+var scoreDisplay = document.querySelector("#score-col");
 
 
 document.addEventListener("click", function () {
 
     let targetId = event.target.id;
+    let targetValue = event.target.value;
     let targetTagName = event.target.nodeName;
 
     //Changes prompt when a button is pushed
     if (targetTagName == "BUTTON") {
-        if (targetId == "start") {
-            interval = setInterval(startTimer, 1000);
+        if(targetValue == "RESPONSE") {
+            if (targetId == "start") {
+                interval = setInterval(startTimer, 1000);
+            }
+            else if (qIndex > 0 && targetId == questions[qIndex - 1].correctResponse) {
+                wasCorrect = true;
+                score++;
+            }
+            else {
+                wasCorrect = false;
+                timeElapsed = timeElapsed + 10;
+            }
+    
+            if (qIndex < questions.length) {
+                renderNextQuestion();
+                qIndex++;
+            }
+            else {
+                clearInterval(interval);
+                renderReport();
+            }
         }
-        else if (qIndex > 0 && targetId == questions[qIndex - 1].correctResponse) {
-            wasCorrect = true;
-            score++;
+        else if(targetValue == "GETSCORES") {
+            renderScores();
         }
-        else {
-            wasCorrect = false;
-            timeElapsed = timeElapsed + 10;
-        }
-
-        if (qIndex < questions.length) {
-            renderNextQuestion();
-            qIndex++;
-        }
-        else {
-            clearInterval(interval);
-            renderReport();
+        else if(targetValue == "HIDESCORES") {
+            hideScores();
         }
     }
 });
@@ -85,7 +95,7 @@ document.addEventListener("submit", function () {
         submitted = true;
     }
     userInitials.value = "";
-})
+});
 
 function renderNextQuestion() {
     //clear prompt
@@ -102,6 +112,7 @@ function renderNextQuestion() {
         let buttonNode = document.createElement("BUTTON");
         buttonNode.textContent = questions[qIndex].response[i];
         buttonNode.className += "btn btn-primary btn-lg";
+        buttonNode.value = "RESPONSE";
         buttonNode.id = i;
         promptDisplay.appendChild(buttonNode);
     }
@@ -128,6 +139,7 @@ function renderStart() {
     //Adds start button
     node = document.createElement("BUTTON");
     node.textContent = "Start Quiz";
+    node.value = "RESPONSE";
     node.className += "btn btn-danger btn-lg";
     node.id = "start";
     promptDisplay.appendChild(node);
@@ -140,7 +152,7 @@ function renderReport() {
 
     //Shows user their final score
     var node = document.createElement("H3");
-    node.textContent = "You scored : " + (timeRemaining / 10);
+    node.textContent = "You scored : " + (score + timeRemaining / 10);
     node.style.color = "gold";
     promptDisplay.appendChild(node);
 
@@ -167,6 +179,39 @@ function renderReport() {
 
     //Points at our new element for submit event handler
     userInitials = document.querySelector("#initials");
+}
+
+function renderScores() {
+
+    //Creating ordered list to append to score column
+    let node = document.createElement("OL")
+    node.id = "score-list";
+    let records = localStorage.getItem("Records");
+    let scoreButton = document.querySelector("#score-col").children[0];
+
+
+    records == null ? records = '': records = JSON.parse(records);
+
+    records.forEach(function (item) {
+        let childNode = document.createElement("LI");
+        childNode.innerHTML = "Name: " + item.initials + " Score: " + item.score + " Date: " + item.date.toString();
+        node.appendChild(childNode);
+    });
+
+    scoreDisplay.appendChild(node);
+
+    //Change score button
+    scoreButton.textContent = "Hide Scores";
+    scoreButton.value = "HIDESCORES";
+
+}
+
+function hideScores() {
+    let scoreButton = document.querySelector("#score-col").children[0];
+    scoreButton.value = "GETSCORES";
+    scoreButton.textContent = "View Highscores";
+
+    document.querySelector("#score-list").remove();
 }
 
 function startTimer() {
