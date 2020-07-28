@@ -31,6 +31,7 @@ var interval;
 var userInitials;
 var submitted = false;
 var promptDisplay = document.querySelector("#prompt-display");
+var promptChoices = document.querySelector("#prompt-choices");
 var timeDisplay = document.querySelector("#time-left");
 var scoreDisplay = document.querySelector("#score-col");
 
@@ -80,7 +81,7 @@ document.addEventListener("submit", function () {
 
     if(!submitted){
 
-        let r = new Record (userInitials.value, score, new Date());
+        let r = new Record (userInitials.value, (score + (startingTime - timeElapsed)/10), new Date());
         let temp = localStorage.getItem("Records");
 
         if(temp == null){
@@ -93,6 +94,10 @@ document.addEventListener("submit", function () {
             localStorage.setItem("Records", JSON.stringify(temp));
         }
         submitted = true;
+        
+        let node = document.createElement("p");
+        node.innerHTML = "<i>Submitted</i>"
+        promptDisplay.appendChild(node);
     }
     userInitials.value = "";
 });
@@ -102,20 +107,28 @@ function renderNextQuestion() {
     promptDisplay.innerHTML = "";
 
     //Adds question text to prompt
+    var div = document.createElement("DIV");
+    div.id = "prompt-text";
+    
     var node = document.createElement("H3");
-    var textNode = document.createTextNode(questions[qIndex].questionText);
-    node.appendChild(textNode);
-    promptDisplay.appendChild(node);
+    node.textContent = questions[qIndex].questionText;
+    div.appendChild(node);
+    promptDisplay.appendChild(div);
 
-    //Adds buttons for choices
+    div = document.createElement("DIV");
+    div.id = "prompt-choices";
+
+    //Adds buttons div for choices
     for (i = 0; i < questions[qIndex].response.length; i++) {
         let buttonNode = document.createElement("BUTTON");
         buttonNode.textContent = questions[qIndex].response[i];
         buttonNode.className += "btn btn-primary btn-lg";
         buttonNode.value = "RESPONSE";
         buttonNode.id = i;
-        promptDisplay.appendChild(buttonNode);
+        div.appendChild(buttonNode);
     }
+
+    promptDisplay.appendChild(div);
 
     //Adds line with with text describing if last question was answered correctly
     node = document.createElement("hr");
@@ -128,13 +141,21 @@ function renderNextQuestion() {
     }
 }
 
+function renderTimer(){
+
+}
+
 function renderStart() {
     promptDisplay.innerHTML = "";
 
     //Adds quiz details
+    var div = document.createElement("DIV");
+    div.id = "prompt-text";
+
     var node = document.createElement("H3");
     node.textContent = "Answer as many questions within the given amount of time. Keep in mind that answering incorrectly will deduct 10 seconds from the clock. Your score is equal to the amount of questions answered correctly plus the amount of time left on the clock divided by 10. Press start to begin!";
-    promptDisplay.appendChild(node);
+    node.className += "text-center";
+    div.appendChild(node);
 
     //Adds start button
     node = document.createElement("BUTTON");
@@ -142,7 +163,8 @@ function renderStart() {
     node.value = "RESPONSE";
     node.className += "btn btn-danger btn-lg";
     node.id = "start";
-    promptDisplay.appendChild(node);
+    div.appendChild(node);
+    promptDisplay.appendChild(div);
 }
 
 function renderReport() {
@@ -158,7 +180,7 @@ function renderReport() {
 
     //Shows questions answered correctly and time remaining
     node = document.createElement("H3");
-    node.textContent = "You answered " + score + " question(s) correctly with " + timeRemaining + " second(s) remaining.";
+    node.textContent = "You answered " + score + " out of " + questions.length + " questions correctly with " + timeRemaining + " second(s) remaining.";
     promptDisplay.appendChild(node);
 
     //Creates a form for user name and score recording
@@ -167,18 +189,22 @@ function renderReport() {
     node.method = "POST";
 
     var childNode = document.createElement("LABEL");
-    childNode.textContent = "Enter intials: ";
+    childNode.textContent = "Enter name: ";
     childNode.for = "initials"
     node.appendChild(childNode);
 
     childNode = document.createElement("INPUT");
     childNode.id = "initials";
     childNode.type = "Text";
+    childNode.maxlength = 15;
     node.appendChild(childNode);
     promptDisplay.appendChild(node);
 
     //Points at our new element for submit event handler
     userInitials = document.querySelector("#initials");
+
+    //Re-renders timer
+    timeDisplay.textContent = startingTime - timeElapsed;
 }
 
 function renderScores() {
@@ -186,15 +212,16 @@ function renderScores() {
     //Creating ordered list to append to score column
     let node = document.createElement("OL")
     node.id = "score-list";
+
     let records = localStorage.getItem("Records");
     let scoreButton = document.querySelector("#score-col").children[0];
-
 
     records == null ? records = '': records = JSON.parse(records);
 
     records.forEach(function (item) {
         let childNode = document.createElement("LI");
-        childNode.innerHTML = "Name: " + item.initials + " Score: " + item.score + " Date: " + item.date.toString();
+
+        childNode.innerHTML = item.initials + "\nScored: " + item.score;
         node.appendChild(childNode);
     });
 

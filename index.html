@@ -18,25 +18,45 @@
 
     <div class="container-fluid">
 
+
+        <div class="row">
+            <div class="header col-md-12">
+                <ul>
+                    <li>
+                        <h1>CQs</h1>
+                    </li>
+                    <li>Javascript</li>
+                    <li>HTML</li>
+                    <li>CSS</li>
+                </ul>
+            </div>
+        </div>
+
         <div class="row">
 
             <div class="col-md-2">
-                <div id="score-col" class="row">
-                    <button class="btn btn-warning btn-lg mx-auto d-block" value="GETSCORES">View Highscores</button>
+                <div id="score-col">
+                    <button class="btn btn-warning btn-lg text-center" value="GETSCORES">View Highscores</button>
                 </div>
             </div>
 
             <div class="col-md-8 text-center">
                 <h1>Javascript Quiz</h1>
+                <hr>
                 <div id="prompt-display"></div>
             </div>
 
-            <div class="col-md-2 text-center" >
-                <h5>Timer: <span id="time-left"></span></h5>
+            <div class="col-md-2 text-center">
+                <div id="time-col">
+                    <button class="btn btn-warning btn-lg" value="GET-TIME">View Time</button>
+                </div>
+                <h5><span id="time-left"></span></h5>
             </div>
+
         </div>
 
     </div>
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
